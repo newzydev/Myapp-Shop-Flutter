@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'models/cartList.dart';
 import 'models/productList.dart';
 import 'widgets/products_catalog.dart';
+import 'widgets/products_manage.dart';
 import 'widgets/profile.dart';
 import 'widgets/shoping_cart.dart';
 
@@ -27,6 +28,7 @@ class MainApp extends StatelessWidget {
           children: <Widget>[
             ProductsCatalog(),
             ShopingCart(),
+            ProductsManage(),
             Profile(),
           ],
         ),
@@ -45,6 +47,13 @@ class MainApp extends StatelessWidget {
                 color: Colors.red,
               ),
               text: "Cart",
+            ),
+            Tab(
+              icon: Icon(
+                Icons.edit_note,
+                color: Colors.red,
+              ),
+              text: "Manage",
             ),
             Tab(
               icon: Icon(

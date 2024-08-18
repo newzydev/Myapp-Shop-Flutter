@@ -6,16 +6,19 @@ import '../models/product.dart';
 import '../models/productList.dart';
 import 'card_product.dart';
 
-Future<List<Product>> fetchSubjects(BuildContext context) async {
+Future<List<Product>> fetchProducts(BuildContext context) async {
   List<Product> products = context.read<ProductList>().products;
   if (products.isEmpty) {
     var dio = Dio();
-    var result = await dio.get(
+    var response = await dio.get(
         'https://66801bbc56c2c76b495b2f6e.mockapi.io/online_store/products');
-    products = result.data.map<Product>(Product.fromJson).toList();
 
-    if (context.mounted) {
-      context.read<ProductList>().setProducts(products);
+    if (response.statusCode == 200) {
+      products = response.data.map<Product>(Product.fromJson).toList();
+
+      if (context.mounted) {
+        context.read<ProductList>().setProducts(products);
+      }
     }
   }
 
@@ -30,7 +33,7 @@ class ProductsCatalog extends StatefulWidget {
 }
 
 class _ProductsCatalogState extends State<ProductsCatalog> {
-  double _priceMax = 500;
+  double _priceMax = 0;
   String _selectedOrder = 'asc';
 
   @override
@@ -44,13 +47,13 @@ class _ProductsCatalogState extends State<ProductsCatalog> {
             children: [
               const Padding(
                 padding: EdgeInsets.only(left: 8.0),
-                child: Text("ราคา : "),
+                child: Text("ราคา: "),
               ),
               Expanded(
                 child: Slider(
                   value: _priceMax,
-                  min: 1,
-                  max: 500,
+                  min: 0,
+                  max: 1000,
                   divisions: 100,
                   label: _priceMax.round().toString(),
                   onChanged: (double value) {
@@ -66,7 +69,7 @@ class _ProductsCatalogState extends State<ProductsCatalog> {
             children: [
               const Padding(
                 padding: EdgeInsets.only(left: 8.0),
-                child: Text("จัดเรียง : "),
+                child: Text("จัดเรียง: "),
               ),
               Expanded(
                 child: DropdownButton<String>(
@@ -87,13 +90,18 @@ class _ProductsCatalogState extends State<ProductsCatalog> {
             ],
           ),
           FutureBuilder(
-            future: fetchSubjects(context),
+            future: fetchProducts(context),
             builder: (context, snapshot) {
               if (snapshot.hasData) {
+                var products = (snapshot.data ?? []);
+
                 //สินค้าที่ไม่เกินราคาสูงสุด
-                var products = (snapshot.data ?? [])
-                    .where((p) => double.parse(p.price.toString()) < _priceMax)
-                    .toList();
+                if (_priceMax != 0) {
+                  products = products
+                      .where(
+                          (p) => double.parse(p.price.toString()) < _priceMax)
+                      .toList();
+                }
 
                 //จัดเรียงตามราคา
                 if (_selectedOrder == 'asc') {

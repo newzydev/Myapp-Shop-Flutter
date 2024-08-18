@@ -7,6 +7,8 @@ class Product {
 
   Product({this.id, this.name, this.price, this.imageUrl, this.detail});
 
+  Product.empty();
+
   factory Product.fromJson(dynamic data) {
     return Product(
         id: data['id'],
@@ -14,5 +16,9 @@ class Product {
         price: data['price'],
         imageUrl: data['imageUrl'],
         detail: data['detail']);
+  }
+
+  Object? toJson() {
+    return null;
   }
 }
